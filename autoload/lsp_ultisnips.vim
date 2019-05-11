@@ -51,24 +51,11 @@ function! s:expand_snippet(timer) abort
     call feedkeys("\<C-r>=UltiSnips#Anon(\"" . s:snippet . "\", \"" . s:trigger . "\", '', 'i')\<CR>")
 endfunction
 
-function! s:handle_snippet(item) abort
-    if !has_key(a:item, 'user_data')
-        return
-    endif
+function! lsp_ultisnips#handle_snippet(completed_item, user_data) abort
 
-    let l:user_data = json_decode(a:item['user_data'])
-
-    if (type(l:user_data) != type({})) || (!has_key(l:user_data, 'vim-lsp-ultisnips'))
-        return
-    endif
-
-    let s:trigger = l:user_data['vim-lsp-ultisnips']['trigger']
-    let s:snippet = l:user_data['vim-lsp-ultisnips']['snippet']
+    let s:trigger = a:user_data['vim-lsp-ultisnips']['trigger']
+    let s:snippet = a:user_data['vim-lsp-ultisnips']['snippet']
 
     call timer_start(0, function('s:expand_snippet'))
 endfunction
 
-augroup lsp_ultisnips
-    autocmd!
-    autocmd CompleteDone * call s:handle_snippet(v:completed_item)
-augroup END
